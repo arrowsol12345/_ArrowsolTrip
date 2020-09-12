@@ -1,0 +1,30 @@
+#%RAML 1.0
+title: _ASTripApi
+baseUri: htp://localhost:8080/api
+
+
+/ArrowsolTrip_createAccount:
+  post:
+    body:
+      application/json:
+       example:
+         {
+           "AccountId":101,
+           "AccountName":"Rama Krishna",
+           "Age":30,
+           "Gender":"Male",
+           "Email":"ramakrishna@gmail.com",
+           "Phone":9900010000,
+           "DOB":"31-08-1980"
+         }
+    responses:
+      201:
+       body:
+         application/json:
+           example:
+             {
+              "Message":"Account Created Successfully"
+             }
+                
+         
+    

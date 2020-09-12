@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="db614915-5b2c-496f-b6d9-96ed769bc34c" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="integration" />
+	</db:config>
+	<flow name="ArrowsolTrip_createAccountFlow" doc:id="3bd6d8df-0cf5-422e-b672-4627cc34c708" >
+		<http:listener doc:name="Listener" doc:id="8f31cced-fe84-4d55-8095-641cb40f00ad" config-ref="_arrowsoltripapi-httpListenerConfig" path="/arrowsolTrip_createAccount"/>
+		<logger level="INFO" doc:name="Source Request Received" doc:id="70dccd7a-0938-45e7-b726-bb3693741135" message="Request Received from Source...................... #[payload]"/>
+		<db:insert doc:name="Inserting Data to DataBase" doc:id="f1bd42fe-0391-444d-8bc2-e0d58be5e8a0" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into Account(name, gender,phone, email,dateOfBirth) 
+values (:name,:gender,:phone, :email,:dateofBirth) ;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+		name:payload.name,
+		gender:payload.gender,
+		phone:payload.phone,
+		email:payload.email,
+		dateofBirth:payload.dateOfBirth
+		
+	}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="82c221bd-73e2-4691-9f2a-efc71d4ae585" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": "201",
+	"message":"Account created successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Account Created Successfully" doc:id="c7037108-d347-44cb-9cf6-3731c565045a" message="Account Created Successfully....................... #[payload]"/>
+	</flow>
+</mule>
